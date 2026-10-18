@@ -1,0 +1,68 @@
+name: Daily collection
+
+# Collects new postings every morning, extracts skills, precomputes embeddings, and uploads the
+# database to your private Hugging Face dataset, where the hosted app picks it up.
+on:
+  schedule:
+    - cron: "0 5 * * *"        # 05:00 UTC = 06:00/07:00 in Germany
+  workflow_dispatch:            # "Run workflow" button for a manual run
+
+concurrency: daily-collection   # never two runs at once
+
+permissions:
+  contents: write               # to save discovered career-page systems back to companies.json
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      HF_TOKEN: ${{ secrets.HF_TOKEN }}
+      HF_DATASET_REPO: ${{ secrets.HF_DATASET_REPO }}
+      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+      ADZUNA_APP_ID: ${{ secrets.ADZUNA_APP_ID }}
+      ADZUNA_APP_KEY: ${{ secrets.ADZUNA_APP_KEY }}
+      EMBED_BACKEND: fastembed
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+
+      # If this step fails, every later step is skipped: we never upload a database that
+      # didn't start from your existing data.
+      - name: Download existing data
+        run: python -m skillmarker.storage --pull
+
+      - name: Bundesagentur
+        continue-on-error: true
+        run: python -m skillmarker.collect --days 14
+      - name: Discover career-page systems (only companies not resolved yet)
+        continue-on-error: true
+        run: python -m skillmarker.careers --discover
+      - name: Company career pages
+        continue-on-error: true
+        run: python -m skillmarker.careers
+      - name: Aggregators
+        continue-on-error: true
+        run: python -m skillmarker.aggregators
+      - name: Extract skills (new postings only, at most $0.30 per day)
+        continue-on-error: true
+        run: python -m skillmarker.extract --source live --max-cost 0.30
+      - name: Precompute embeddings
+        continue-on-error: true
+        run: python -m skillmarker.embeddings --source live
+
+      - name: Upload database
+        run: python -c "from skillmarker import storage; storage.push_live('Daily collection')"
+
+      - name: Save discovered systems to companies.json
+        run: |
+          if ! git diff --quiet companies.json; then
+            git config user.name "skillmarker-bot"
+            git config user.email "skillmarker-bot@users.noreply.github.com"
+            git commit -am "Update discovered career-page systems"
+            git push
+          fi

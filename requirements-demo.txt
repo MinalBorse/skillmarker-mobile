@@ -1,0 +1,5 @@
+# Demo-video pipeline (scripts/record_demo.py, scripts/add_voiceover.py)
+# After installing, download the browser once:  playwright install chromium
+playwright>=1.51      # 1.51+ needed for locator.filter(visible=True)
+edge-tts>=6.1         # Microsoft neural voices (needs internet)
+static-ffmpeg>=2.5    # automatic ffmpeg if none is installed

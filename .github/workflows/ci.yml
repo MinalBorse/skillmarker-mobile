@@ -1,0 +1,24 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      SKILLMARKER_MOCK_LLM: "1"   # free and deterministic
+      EMBED_BACKEND: hash          # no model download in CI
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Tests (taxonomy, privacy, extraction, collector, analysis, matching, app)
+        run: pytest -q
+      - name: Extraction evaluation on sample data
+        run: |
+          python -m skillmarker.sample --n 800
+          python -m skillmarker.extract --method rules
+          python -m skillmarker.evaluate

@@ -1,0 +1,11 @@
+[theme]
+base = "light"
+primaryColor = "#2B3A8C"
+backgroundColor = "#EEF1F4"
+secondaryBackgroundColor = "#E2E7ED"
+textColor = "#16202B"
+font = "sans serif"
+
+[server]
+headless = true
+enableStaticServing = true   # serves ./static (bundled fonts)

@@ -1,0 +1,13 @@
+pandas>=2.2
+numpy>=1.26
+duckdb>=1.1
+requests>=2.31
+python-dotenv>=1.0
+pydantic>=2.7
+openai>=1.40          # any OpenAI-compatible API, OpenRouter by default
+fastembed>=0.4        # local multilingual embeddings on the CPU (no PyTorch needed)
+pypdf>=4.0            # read CVs uploaded as PDF
+streamlit>=1.46
+plotly>=5.20
+tabulate>=0.9         # markdown tables in docs/EVAL.md
+pytest>=8

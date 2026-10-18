@@ -1,0 +1,39 @@
+{
+  "_help": "Actions: click, tab, select (+ option), type (+ into, submit), scroll_to, wait_for (+ timeout, cut), pause. Run `python scripts/check_scenes.py` after editing.",
+  "app": {
+    "entry": "app.py",
+    "env": {"SKILLMARKER_DATA_DIR": "{tmp}"},
+    "ready_text": "No job postings yet",
+    "startup_timeout": 90,
+    "viewport": {"width": 1920, "height": 1080}
+  },
+  "settings": {"words_per_second": 2.6, "action_timeout": 30, "end_hold_ms": 2500},
+  "scenes": [
+    {"id": "intro", "caption": "Skillmarker: the German data and AI job market, highlighted",
+     "actions": [{"click": "Generate sample postings"}, {"wait_for": "appears in", "timeout": 120, "cut": true}],
+     "voice": "Skillmarker analyses data and AI job postings in Germany, from the official job board of the Bundesagentur für Arbeit. An AI model reads every posting and extracts the skills, seniority, salary and language requirements."},
+    {"id": "skills", "caption": "Which skills employers ask for",
+     "actions": [{"pause": 1500}, {"scroll_to": "Rising fastest"}],
+     "voice": "Python and SQL lead, as expected. More interesting is what is rising: large language models, LangGraph, agentic AI and MCP are growing fastest."},
+    {"id": "role", "caption": "Every view filters by role",
+     "actions": [{"scroll_to": "All roles"}, {"click": "AI Engineer"}, {"wait_for": "AI Engineer postings"}],
+     "voice": "Every view can be narrowed to one role, here AI engineers, to see exactly what that market asks for."},
+    {"id": "roles", "caption": "Seniority, salaries and German requirements",
+     "actions": [{"tab": "Roles and pay"}, {"wait_for": "of postings state a salary"}],
+     "voice": "The roles view shows seniority, stated salaries with their sample sizes, and how many postings require fluent German, which matters a lot for international candidates."},
+    {"id": "match", "caption": "Match my CV: fit and the skills to learn next",
+     "actions": [{"tab": "Match my CV"}, {"click": "Use a sample CV"},
+                 {"wait_for": "postings you're aiming for", "timeout": 180, "cut": true}, {"scroll_to": "Learn next"}],
+     "voice": "Paste a CV, and Skillmarker shows how many target postings you could apply for, and which missing skills are asked for most. Contact details are removed before anything is analysed."},
+    {"id": "ads", "caption": "Job ads, marked up: green you have it, pink you don't",
+     "actions": [{"scroll_to": "Your best matches"}, {"pause": 2500}],
+     "voice": "The best matches are shown like printed ads, marked up with highlighters: green for skills you have, pink for the ones you don't have yet."},
+    {"id": "ask", "caption": "Ask the market, with every answer cited",
+     "actions": [{"tab": "Ask the market"}, {"click": "Which AI engineer jobs ask for LangGraph or agents?"},
+                 {"wait_for": "[1]", "timeout": 120, "cut": true}],
+     "voice": "You can also ask questions. The answer is built only from matching postings, and each one is cited, so every claim can be checked."},
+    {"id": "outro", "caption": "Measured, cost-tracked and tested",
+     "actions": [{"tab": "Data and costs"}, {"wait_for": "AI costs"}],
+     "voice": "Every AI call's cost is logged, extraction accuracy is measured against known answers, and the whole project is covered by automated tests."}
+  ]
+}
